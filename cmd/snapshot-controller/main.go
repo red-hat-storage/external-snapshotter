@@ -172,6 +172,9 @@ func main() {
 		klog.Fatal("Error while parsing feature gates: ", err)
 	}
 
+	// Enable VGS unconditionally
+	utilfeature.DefaultMutableFeatureGate.OverrideDefault(features.VolumeGroupSnapshot, true)
+
 	if *showVersion {
 		fmt.Println(os.Args[0], version)
 		os.Exit(0)
