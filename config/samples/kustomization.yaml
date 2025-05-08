@@ -1,0 +1,5 @@
+## Append samples of your project ##
+resources:
+- groupsnapshot-v1beta1.yaml
+- groupsnapshotclass-v1beta1.yaml
+# +kubebuilder:scaffold:manifestskustomizesamples
