@@ -1,0 +1,8 @@
+# Adds namespace to all resources.
+namespace: openshift-storage
+
+resources:
+- manager.yaml
+
+generatorOptions:
+  disableNameSuffixHash: true

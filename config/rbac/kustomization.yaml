@@ -1,0 +1,14 @@
+resources:
+# All RBAC will be applied under this service account in
+# the deployment namespace. You may comment out this resource
+# if your manager will use a service account that exists at
+# runtime. Be sure to update RoleBinding and ClusterRoleBinding
+# subjects if changing service account names.
+# The following RBAC configurations are for the external-snapshotter
+# controller that will be deployed as part of the ceph-csi-operator
+# bundle.
+- snapshot_controller_role.yaml
+- snapshot_controller_role_binding.yaml
+- snapshot_controller_cluster_role.yaml
+- snapshot_controller_cluster_role_binding.yaml
+- snapshot_controller_service_account.yaml

@@ -1,0 +1,9 @@
+---
+apiVersion: groupsnapshot.storage.openshift.io/v1beta1
+kind: VolumeGroupSnapshotClass
+metadata:
+  name: sample-groupsnapclass
+driver: openshift-storage.cephfs.csi.ceph.com
+deletionPolicy: Delete
+parameters:
+  clusterID: openshift-storage
