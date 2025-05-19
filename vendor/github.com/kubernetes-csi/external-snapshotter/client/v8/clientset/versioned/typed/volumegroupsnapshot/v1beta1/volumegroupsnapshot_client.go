@@ -33,7 +33,7 @@ type GroupsnapshotV1beta1Interface interface {
 	VolumeGroupSnapshotContentsGetter
 }
 
-// GroupsnapshotV1beta1Client is used to interact with features provided by the groupsnapshot.storage.k8s.io group.
+// GroupsnapshotV1beta1Client is used to interact with features provided by the groupsnapshot.storage.openshift.io group.
 type GroupsnapshotV1beta1Client struct {
 	restClient rest.Interface
 }

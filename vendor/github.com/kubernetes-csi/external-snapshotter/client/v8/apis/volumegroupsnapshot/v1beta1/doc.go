@@ -15,6 +15,6 @@ limitations under the License.
 */
 
 // +k8s:deepcopy-gen=package
-// +groupName=groupsnapshot.storage.k8s.io
+// +groupName=groupsnapshot.storage.openshift.io
 
 package v1beta1
