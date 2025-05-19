@@ -1,0 +1,36 @@
+---
+name: build
+
+on:
+  push:
+    branches: ["master"]
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  image-build:
+    name: build images
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build images
+        run: make build
+
+  bundle-bundle:
+    name: build bundle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Build bundle
+        run: |
+          make -f Makefile.Downstream.mk bundle
+          msg='Uncommitted bundle changes. Run `make -f Makefile.Downstream.mk bundle` and commit results.'
+          git diff --exit-code bundle || (echo -e '\e[31m'"$msg"; exit 1)
