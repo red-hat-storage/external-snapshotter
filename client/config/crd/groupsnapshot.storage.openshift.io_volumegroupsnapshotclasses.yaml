@@ -5,9 +5,9 @@ metadata:
   annotations:
     api-approved.kubernetes.io: "https://github.com/kubernetes-csi/external-snapshotter/pull/1150"
     controller-gen.kubebuilder.io/version: v0.15.0
-  name: volumegroupsnapshotclasses.groupsnapshot.storage.k8s.io
+  name: volumegroupsnapshotclasses.groupsnapshot.storage.openshift.io
 spec:
-  group: groupsnapshot.storage.k8s.io
+  group: groupsnapshot.storage.openshift.io
   names:
     kind: VolumeGroupSnapshotClass
     listKind: VolumeGroupSnapshotClassList
