@@ -1322,7 +1322,7 @@ func newGroupSnapshotContent(groupSnapshotContentName, boundToGroupSnapshotUID, 
 	if boundToGroupSnapshotName != "" {
 		content.Spec.VolumeGroupSnapshotRef = v1.ObjectReference{
 			Kind:            "VolumeGroupSnapshot",
-			APIVersion:      "groupsnapshot.storage.k8s.io/v1beta1",
+			APIVersion:      "groupsnapshot.storage.openshift.io/v1beta1",
 			UID:             types.UID(boundToGroupSnapshotUID),
 			Namespace:       testNamespace,
 			Name:            boundToGroupSnapshotName,
@@ -1492,7 +1492,7 @@ func newGroupSnapshot(
 			Namespace:         testNamespace,
 			UID:               types.UID(groupSnapshotUID),
 			ResourceVersion:   "1",
-			SelfLink:          "/apis/groupsnapshot.storage.k8s.io/v1beta1/namespaces/" + testNamespace + "/volumesnapshots/" + groupSnapshotName,
+			SelfLink:          "/apis/groupsnapshot.storage.openshift.io/v1beta1/namespaces/" + testNamespace + "/volumesnapshots/" + groupSnapshotName,
 			DeletionTimestamp: deletionTimestamp,
 		},
 		Spec: crdv1beta1.VolumeGroupSnapshotSpec{
