@@ -110,7 +110,7 @@ func TestCreateGroupSnapshotSync(t *testing.T) {
 					"app.kubernetes.io/name": "postgresql",
 				},
 				"", classNonExisting, "", &False, nil,
-				newVolumeError(`failed to create group snapshot content with error failed to get input parameters to create group snapshot group-snap-1-1: "volumegroupsnapshotclass.groupsnapshot.storage.k8s.io \"non-existing\" not found"`),
+				newVolumeError(`failed to create group snapshot content with error failed to get input parameters to create group snapshot group-snap-1-1: "volumegroupsnapshotclass.groupsnapshot.storage.openshift.io \"non-existing\" not found"`),
 				false, false, nil,
 			),
 			initialGroupContents:  nogroupcontents,
