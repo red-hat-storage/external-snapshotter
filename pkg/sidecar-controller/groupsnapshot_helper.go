@@ -30,6 +30,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	klog "k8s.io/klog/v2"
 
+	"github.com/container-storage-interface/spec/lib/go/csi"
 	crdv1beta1 "github.com/kubernetes-csi/external-snapshotter/client/v8/apis/volumegroupsnapshot/v1beta1"
 	crdv1 "github.com/kubernetes-csi/external-snapshotter/client/v8/apis/volumesnapshot/v1"
 	"github.com/kubernetes-csi/external-snapshotter/v8/pkg/utils"
@@ -199,10 +200,12 @@ func (ctrl *csiSnapshotSideCarController) syncGroupSnapshotContent(groupSnapshot
 	// true. We don't want to keep calling CreateGroupSnapshot CSI methods over
 	// and over again for performance reasons.
 	var err error
-	if groupSnapshotContent.Status != nil && groupSnapshotContent.Status.ReadyToUse != nil && *groupSnapshotContent.Status.ReadyToUse == true {
+	if groupSnapshotContent.Status != nil && groupSnapshotContent.Status.ReadyToUse != nil && *groupSnapshotContent.Status.ReadyToUse {
 		// Try to remove AnnVolumeGroupSnapshotBeingCreated if it is not removed yet for some reason
 		_, err = ctrl.removeAnnVolumeGroupSnapshotBeingCreated(groupSnapshotContent)
-		return err
+		if err != nil {
+			return err
+		}
 	}
 	return ctrl.checkandUpdateGroupSnapshotContentStatus(groupSnapshotContent)
 }
@@ -719,13 +722,13 @@ func (ctrl *csiSnapshotSideCarController) updateGroupSnapshotContentErrorStatusW
 
 // GetSnapshotNameForVolumeGroupSnapshotContent returns a unique snapshot name for a VolumeGroupSnapshotContent.
 func GetSnapshotNameForVolumeGroupSnapshotContent(groupSnapshotContentUUID, pvUUID string) string {
-	return fmt.Sprintf("snapshot-%x-%s", sha256.Sum256([]byte(groupSnapshotContentUUID+pvUUID)), time.Now().Format("2006-01-02-3.4.5"))
+	return fmt.Sprintf("snapshot-%x", sha256.Sum256([]byte(groupSnapshotContentUUID+pvUUID)))
 }
 
 // GetSnapshotContentNameForVolumeGroupSnapshotContent returns a unique content name for the
 // passed in VolumeGroupSnapshotContent.
 func GetSnapshotContentNameForVolumeGroupSnapshotContent(groupSnapshotContentUUID, pvUUID string) string {
-	return fmt.Sprintf("snapcontent-%x-%s", sha256.Sum256([]byte(groupSnapshotContentUUID+pvUUID)), time.Now().Format("2006-01-02-3.4.5"))
+	return fmt.Sprintf("snapcontent-%x", sha256.Sum256([]byte(groupSnapshotContentUUID+pvUUID)))
 }
 
 func (ctrl *csiSnapshotSideCarController) checkandUpdateGroupSnapshotContentStatus(groupSnapshotContent *crdv1beta1.VolumeGroupSnapshotContent) error {
@@ -751,6 +754,7 @@ func (ctrl *csiSnapshotSideCarController) checkandUpdateGroupSnapshotContentStat
 	readyToUse := false
 	var driverName string
 	var groupSnapshotID string
+	var csiSnaps []*csi.Snapshot
 	var groupSnapshotCredentials map[string]string
 
 	if groupSnapshotContent.Spec.Source.GroupSnapshotHandles != nil {
@@ -778,7 +782,7 @@ func (ctrl *csiSnapshotSideCarController) checkandUpdateGroupSnapshotContentStat
 		}
 
 		snapshotIDs := groupSnapshotContent.Spec.Source.GroupSnapshotHandles.VolumeSnapshotHandles
-		readyToUse, creationTime, err = ctrl.handler.GetGroupSnapshotStatus(groupSnapshotContent, snapshotIDs, groupSnapshotCredentials)
+		readyToUse, creationTime, _, err = ctrl.handler.GetGroupSnapshotStatus(groupSnapshotContent, snapshotIDs, groupSnapshotCredentials)
 		if err != nil {
 			klog.Errorf("checkandUpdateGroupSnapshotContentStatusOperation: failed to call get group snapshot status to check whether group snapshot is ready to use %q", err)
 			return groupSnapshotContent, err
@@ -799,5 +803,54 @@ func (ctrl *csiSnapshotSideCarController) checkandUpdateGroupSnapshotContentStat
 		}
 		return updatedContent, nil
 	}
-	return ctrl.createGroupSnapshotWrapper(groupSnapshotContent)
+
+	// FIXME: This is a temporary workaround for restore size
+	// Update volumesnapshot status from here...
+	if groupSnapshotContent.Spec.Source.VolumeHandles != nil && groupSnapshotContent.Status.ReadyToUse != nil && *groupSnapshotContent.Status.ReadyToUse {
+		klog.Info("=== MARK: Updating volgrpcontentstatus nick... ===")
+		creds, err := ctrl.GetCredentialsFromAnnotationForGroupSnapshot(groupSnapshotContent)
+		if err != nil {
+			return groupSnapshotContent, err
+		}
+		var snapHandles []string
+		if groupSnapshotContent.Status.VolumeSnapshotHandlePairList != nil {
+			snapHandles = make([]string, len(groupSnapshotContent.Status.VolumeSnapshotHandlePairList))
+			for i, v := range groupSnapshotContent.Status.VolumeSnapshotHandlePairList {
+				snapHandles[i] = v.SnapshotHandle
+			}
+		}
+
+		if len(snapHandles) > 0 {
+			_, _, csiSnaps, err = ctrl.handler.GetGroupSnapshotStatus(groupSnapshotContent, snapHandles, creds)
+			if err != nil {
+				return groupSnapshotContent, err
+			}
+
+			// Update status for each volumesnapshotcontent
+			for _, csiSnap := range csiSnaps {
+				klog.Info("=== MARK: Updating volsnapcontent... ===")
+				volSnapContentName := GetSnapshotContentNameForVolumeGroupSnapshotContent(string(groupSnapshotContent.UID), csiSnap.SourceVolumeId)
+				// TODO: Maybe update only when snap is a VGS member..
+				volSnapContent, err := ctrl.clientset.SnapshotV1().VolumeSnapshotContents().Get(context.TODO(), volSnapContentName, metav1.GetOptions{})
+				if err != nil {
+					klog.Errorf("failed to fetch volumesnapshotcontent with name: %s", volSnapContentName)
+					continue
+				}
+
+				_, err = ctrl.updateSnapshotContentStatus(volSnapContent, csiSnap.SnapshotId, csiSnap.ReadyToUse,
+					csiSnap.CreationTime.AsTime().Unix(), csiSnap.SizeBytes, csiSnap.GroupSnapshotId)
+				if err != nil {
+					klog.Errorf("failed to update status for volumesnapshotcontent %s due to %v", volSnapContentName, err)
+				}
+			}
+
+		}
+		return groupSnapshotContent, nil
+	}
+
+	// call create only when not ready to use..
+	if groupSnapshotContent.Status.ReadyToUse != nil && !*groupSnapshotContent.Status.ReadyToUse {
+		return ctrl.createGroupSnapshotWrapper(groupSnapshotContent)
+	}
+	return groupSnapshotContent, nil
 }
