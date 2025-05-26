@@ -9,13 +9,13 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: snapshot-controller
+  name: odf-snapshot-controller
   namespace: kube-system
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app.kubernetes.io/name: snapshot-controller
+      app.kubernetes.io/name: odf-snapshot-controller
   # The snapshot controller won't be marked as ready if the v1 CRDs are unavailable.
   # The flag --retry-crd-interval-max is used to determine how long the controller
   # will wait for the CRDs to become available before exiting. The default is 30 seconds
@@ -29,11 +29,11 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: snapshot-controller
+        app.kubernetes.io/name: odf-snapshot-controller
     spec:
-      serviceAccountName: snapshot-controller
+      serviceAccountName: odf-snapshot-controller
       containers:
-        - name: snapshot-controller
+        - name: odf-snapshot-controller
           image: registry.k8s.io/sig-storage/snapshot-controller:v8.2.1
           args:
             - "--v=5"
