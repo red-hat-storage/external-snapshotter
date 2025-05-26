@@ -173,7 +173,7 @@ func (ctrl *csiSnapshotSideCarController) Run(workers int, stopCh <-chan struct{
 	klog.Infof("Starting CSI snapshotter")
 	defer klog.Infof("Shutting CSI snapshotter")
 
-	informersSynced := []cache.InformerSynced{ctrl.contentListerSynced, ctrl.classListerSynced}
+	informersSynced := []cache.InformerSynced{}
 	if ctrl.enableVolumeGroupSnapshots {
 		informersSynced = append(informersSynced, []cache.InformerSynced{ctrl.groupSnapshotContentListerSynced, ctrl.groupSnapshotClassListerSynced}...)
 	}
@@ -186,7 +186,7 @@ func (ctrl *csiSnapshotSideCarController) Run(workers int, stopCh <-chan struct{
 	ctrl.initializeCaches()
 
 	for i := 0; i < workers; i++ {
-		go wait.Until(ctrl.contentWorker, 0, stopCh)
+		// go wait.Until(ctrl.contentWorker, 0, stopCh)
 		if ctrl.enableVolumeGroupSnapshots {
 			go wait.Until(ctrl.groupSnapshotContentWorker, 0, stopCh)
 		}

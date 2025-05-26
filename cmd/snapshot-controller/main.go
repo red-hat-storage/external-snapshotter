@@ -104,11 +104,11 @@ func ensureCustomResourceDefinitionsExist(client *clientset.Clientset, enableVol
 			return false, nil
 		}
 
-		_, err = client.SnapshotV1().VolumeSnapshotClasses().List(ctx, listOptions)
-		if err != nil {
-			klog.Errorf("Failed to list v1 volumesnapshotclasses with error=%+v", err)
-			return false, nil
-		}
+		// _, err = client.SnapshotV1().VolumeSnapshotClasses().List(ctx, listOptions)
+		// if err != nil {
+		// 	klog.Errorf("Failed to list v1 volumesnapshotclasses with error=%+v", err)
+		// 	return false, nil
+		// }
 		_, err = client.SnapshotV1().VolumeSnapshotContents().List(ctx, listOptions)
 		if err != nil {
 			klog.Errorf("Failed to list v1 volumesnapshotcontents with error=%+v", err)
@@ -302,7 +302,7 @@ func main() {
 	if !*leaderElection {
 		run(context.TODO())
 	} else {
-		lockName := "snapshot-controller-leader"
+		lockName := "odf-snapshot-controller-leader"
 		// Create a new clientset for leader election to prevent throttling
 		// due to snapshot controller
 		leClientset, err := kubernetes.NewForConfig(config)
