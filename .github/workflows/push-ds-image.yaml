@@ -40,11 +40,11 @@ jobs:
         docker tag csi-snapshotter:latest $REGISTRY_NAME/csi-snapshotter:$IMAGE_TAG
         docker push $REGISTRY_NAME/csi-snapshotter:$IMAGE_TAG
 
-        # Build and push the snapshotter-controller image
-        make container-snapshotter-controller
-        docker tag snapshotter-controller:latest $REGISTRY_NAME/snapshotter-controller:$IMAGE_TAG
-        docker push $REGISTRY_NAME/snapshotter-controller:$IMAGE_TAG
+        # Build and push the snapshot-controller image
+        make container-snapshot-controller
+        docker tag snapshot-controller:latest $REGISTRY_NAME/snapshot-controller:$IMAGE_TAG
+        docker push $REGISTRY_NAME/snapshot-controller:$IMAGE_TAG
 
-        # Build and push the snapshotter-controller-bundle image
+        # Build and push the snapshot-controller-bundle image
         make -f Makefile.Downstream.mk bundle-build
         make -f Makefile.Downstream.mk bundle-push
