@@ -189,8 +189,8 @@ func NewCSISnapshotCommonController(
 	ctrl.contentLister = volumeSnapshotContentInformer.Lister()
 	ctrl.contentListerSynced = volumeSnapshotContentInformer.Informer().HasSynced
 
-	ctrl.classLister = volumeSnapshotClassInformer.Lister()
-	ctrl.classListerSynced = volumeSnapshotClassInformer.Informer().HasSynced
+	// ctrl.classLister = volumeSnapshotClassInformer.Lister()
+	// ctrl.classListerSynced = volumeSnapshotClassInformer.Informer().HasSynced
 
 	ctrl.enableDistributedSnapshotting = enableDistributedSnapshotting
 
@@ -258,7 +258,7 @@ func (ctrl *csiSnapshotCommonController) Run(workers int, stopCh <-chan struct{}
 	informersSynced := []cache.InformerSynced{
 		ctrl.snapshotListerSynced,
 		ctrl.contentListerSynced,
-		ctrl.classListerSynced,
+		// ctrl.classListerSynced,
 		ctrl.pvcListerSynced,
 		ctrl.pvListerSynced,
 	}
@@ -277,8 +277,8 @@ func (ctrl *csiSnapshotCommonController) Run(workers int, stopCh <-chan struct{}
 	ctrl.initializeCaches()
 
 	for i := 0; i < workers; i++ {
-		go wait.Until(ctrl.snapshotWorker, 0, stopCh)
-		go wait.Until(ctrl.contentWorker, 0, stopCh)
+		// go wait.Until(ctrl.snapshotWorker, 0, stopCh)
+		// go wait.Until(ctrl.contentWorker, 0, stopCh)
 		if ctrl.enableVolumeGroupSnapshots {
 			go wait.Until(ctrl.groupSnapshotWorker, 0, stopCh)
 			go wait.Until(ctrl.groupSnapshotContentWorker, 0, stopCh)
