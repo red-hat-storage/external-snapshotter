@@ -1,12 +1,11 @@
 # defining variables here before including "Makefile" makes these variables unique for current makefile
-IMAGE_REGISTRY ?= quay.io
-REGISTRY_NAME ?= ocs-dev
+REGISTRY_NAME ?= quay.io/ocs-dev
 IMAGE_TAG ?= latest
 IMAGE_NAME ?= snapshot-controller
 
 BUNDLE_IMAGE_NAME ?= $(IMAGE_NAME)-bundle
 
-BUNDLE_IMG ?= $(IMAGE_REGISTRY)/$(REGISTRY_NAME)/$(BUNDLE_IMAGE_NAME):$(IMAGE_TAG)
+BUNDLE_IMG ?= $(REGISTRY_NAME)/$(BUNDLE_IMAGE_NAME):$(IMAGE_TAG)
 
 # the PACKAGE_NAME is included in the bundle/CSV and is used in catalogsources
 # for operators (like OperatorHub.io). Products that include the ceph-csi-operator
