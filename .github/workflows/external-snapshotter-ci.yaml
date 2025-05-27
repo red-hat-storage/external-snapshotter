@@ -1,0 +1,48 @@
+---
+name: sanity checks
+
+on:
+  pull_request:
+    branches: ["*"]
+
+jobs:
+  shellcheck:
+    name: shellcheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Run shellcheck
+        run: make test-shellcheck
+
+  go-test:
+    name: go test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Run go test
+        run: make test-go
+      - name: Run static check
+        run : make test-vet
+
+  verify-changes:
+    name: verify vendor changes
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - name: Verify formatting changes
+        run: make test-fmt
+      - name: Verify vendor changes
+        run: make test-vendor

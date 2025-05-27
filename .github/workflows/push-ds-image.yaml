@@ -1,0 +1,50 @@
+name: image-publisher
+
+on:
+  workflow_dispatch:
+    inputs:
+      REGISTRY_NAME:
+        required: true
+        default: quay.io/ocs-dev
+      IMAGE_TAG:
+        required: true
+        default: "latest"
+
+jobs:
+  docker-push:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+    - uses: docker/login-action@v3
+      with:
+        registry: quay.io
+        username: ${{ secrets.QUAY_USERNAME }}
+        password: ${{ secrets.QUAY_ROBOT_TOKEN }}
+
+    - name: Build and push docker images
+      env:
+        REGISTRY_NAME: ${{ github.event.inputs.REGISTRY_NAME }}
+        IMAGE_TAG: ${{ github.event.inputs.IMAGE_TAG }}
+        IMAGE_BUILD_CMD: docker
+      run: |
+        # Set IMAGE_TAG to a calculated <branch>-<sha> if not specified
+        export IMAGE_TAG=${IMAGE_TAG:-${IMAGE_TAG_SHA:0:-33}}
+
+        # Build and push the csi-snapshotter image
+        make container-csi-snapshotter
+        docker tag csi-snapshotter:latest $REGISTRY_NAME/csi-snapshotter:$IMAGE_TAG
+        docker push $REGISTRY_NAME/csi-snapshotter:$IMAGE_TAG
+
+        # Build and push the snapshotter-controller image
+        make container-snapshotter-controller
+        docker tag snapshotter-controller:latest $REGISTRY_NAME/snapshotter-controller:$IMAGE_TAG
+        docker push $REGISTRY_NAME/snapshotter-controller:$IMAGE_TAG
+
+        # Build and push the snapshotter-controller-bundle image
+        make -f Makefile.Downstream.mk bundle-build
+        make -f Makefile.Downstream.mk bundle-push
