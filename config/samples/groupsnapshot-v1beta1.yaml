@@ -1,0 +1,13 @@
+---
+apiVersion: groupsnapshot.storage.openshift.io/v1beta1
+kind: VolumeGroupSnapshot
+metadata:
+  name: sample-groupsnapshot
+spec:
+  source:
+    selector:
+      matchLabels:
+        # The PVCs will need to have this label for it to be
+        # included in the VolumeGroupSnapshot
+        app.kubernetes.io/name: postgresql
+  volumeGroupSnapshotClassName: sample-groupsnapclass
