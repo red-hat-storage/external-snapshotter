@@ -566,6 +566,7 @@ func (ctrl *csiSnapshotCommonController) createSnapshotsForGroupSnapshotContent(
 				Name: volumeSnapshotContentName,
 				Annotations: map[string]string{
 					utils.VolumeGroupSnapshotHandleAnnotation: *groupSnapshotContent.Status.VolumeGroupSnapshotHandle,
+					utils.AnnODFManagedSnapResource:           "true",
 				},
 			},
 			Spec: crdv1.VolumeSnapshotContentSpec{
@@ -604,6 +605,9 @@ func (ctrl *csiSnapshotCommonController) createSnapshotsForGroupSnapshotContent(
 					utils.BuildVolumeGroupSnapshotOwnerReference(groupSnapshot),
 				},
 				Finalizers: []string{utils.VolumeSnapshotInGroupFinalizer},
+				Annotations: map[string]string{
+					utils.AnnODFManagedSnapResource: "true",
+				},
 			},
 			// The spec stanza is set immediately
 			// The status will be set by VolumeSnapshot reconciler
