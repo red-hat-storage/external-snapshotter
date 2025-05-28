@@ -104,7 +104,7 @@ var (
 
 var (
 	version = "unknown"
-	prefix  = "external-snapshotter-leader"
+	prefix  = "odf-external-snapshotter-leader"
 )
 
 func main() {
