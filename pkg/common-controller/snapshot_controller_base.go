@@ -277,8 +277,8 @@ func (ctrl *csiSnapshotCommonController) Run(workers int, stopCh <-chan struct{}
 	ctrl.initializeCaches()
 
 	for i := 0; i < workers; i++ {
-		// go wait.Until(ctrl.snapshotWorker, 0, stopCh)
-		// go wait.Until(ctrl.contentWorker, 0, stopCh)
+		go wait.Until(ctrl.snapshotWorker, 0, stopCh)
+		go wait.Until(ctrl.contentWorker, 0, stopCh)
 		if ctrl.enableVolumeGroupSnapshots {
 			go wait.Until(ctrl.groupSnapshotWorker, 0, stopCh)
 			go wait.Until(ctrl.groupSnapshotContentWorker, 0, stopCh)
@@ -355,6 +355,11 @@ func (ctrl *csiSnapshotCommonController) syncSnapshotByKey(key string) error {
 	}
 	snapshot, err := ctrl.snapshotLister.VolumeSnapshots(namespace).Get(name)
 	if err == nil {
+		if _, e := snapshot.GetAnnotations()[utils.AnnODFManagedSnapResource]; !e {
+			klog.Infof("%s is not a volumesnapshot managed by ODF, doing nothing for it.", snapshot.GetName())
+
+			return nil
+		}
 		// The volume snapshot still exists in informer cache, the event must have
 		// been add/update/sync
 		newSnapshot, err := ctrl.checkAndUpdateSnapshotClass(snapshot)
@@ -431,6 +436,11 @@ func (ctrl *csiSnapshotCommonController) syncContentByKey(key string) error {
 	// The content still exists in informer cache, the event must have
 	// been add/update/sync
 	if err == nil {
+		if _, e := content.GetAnnotations()[utils.AnnODFManagedSnapResource]; !e {
+			klog.Infof("%s is not a volumesnapshotcontent managed by ODF, doing nothing for it.", content.GetName())
+
+			return nil
+		}
 		// If error occurs we add this item back to the queue
 		return ctrl.updateContent(content)
 	}

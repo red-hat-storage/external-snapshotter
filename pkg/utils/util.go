@@ -156,6 +156,8 @@ const (
 	// VolumeSnapshotContentManagedByLabel is applied by the snapshot controller to the VolumeSnapshotContent object in case distributed snapshotting is enabled.
 	// The value contains the name of the node that handles the snapshot for the volume local to that node.
 	VolumeSnapshotContentManagedByLabel = "snapshot.storage.kubernetes.io/managed-by"
+
+	AnnODFManagedSnapResource = "storage.openshift.io/odf-managed"
 )
 
 var SnapshotterSecretParams = secretParamsMap{

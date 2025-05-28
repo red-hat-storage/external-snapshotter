@@ -186,7 +186,7 @@ func (ctrl *csiSnapshotSideCarController) Run(workers int, stopCh <-chan struct{
 	ctrl.initializeCaches()
 
 	for i := 0; i < workers; i++ {
-		// go wait.Until(ctrl.contentWorker, 0, stopCh)
+		go wait.Until(ctrl.contentWorker, 0, stopCh)
 		if ctrl.enableVolumeGroupSnapshots {
 			go wait.Until(ctrl.groupSnapshotContentWorker, 0, stopCh)
 		}
@@ -259,6 +259,11 @@ func (ctrl *csiSnapshotSideCarController) syncContentByKey(key string) (requeue 
 	// The content still exists in informer cache, the event must have
 	// been add/update/sync
 	if err == nil {
+		if _, e := content.GetAnnotations()[utils.AnnODFManagedSnapResource]; !e {
+			klog.Infof("%s is not a volumesnapshotcontent managed by ODF, doing nothing for it.", content.GetName())
+
+			return false, nil
+		}
 		if ctrl.isDriverMatch(content) {
 			requeue, err = ctrl.updateContentInInformerCache(content)
 		}
