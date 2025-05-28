@@ -132,8 +132,8 @@ func NewCSISnapshotSideCarController(
 	ctrl.contentLister = volumeSnapshotContentInformer.Lister()
 	ctrl.contentListerSynced = volumeSnapshotContentInformer.Informer().HasSynced
 
-	ctrl.classLister = volumeSnapshotClassInformer.Lister()
-	ctrl.classListerSynced = volumeSnapshotClassInformer.Informer().HasSynced
+	// ctrl.classLister = volumeSnapshotClassInformer.Lister()
+	// ctrl.classListerSynced = volumeSnapshotClassInformer.Informer().HasSynced
 
 	ctrl.enableVolumeGroupSnapshots = enableVolumeGroupSnapshots
 	if enableVolumeGroupSnapshots {
@@ -173,7 +173,7 @@ func (ctrl *csiSnapshotSideCarController) Run(workers int, stopCh <-chan struct{
 	klog.Infof("Starting CSI snapshotter")
 	defer klog.Infof("Shutting CSI snapshotter")
 
-	informersSynced := []cache.InformerSynced{}
+	informersSynced := []cache.InformerSynced{ctrl.contentListerSynced}
 	if ctrl.enableVolumeGroupSnapshots {
 		informersSynced = append(informersSynced, []cache.InformerSynced{ctrl.groupSnapshotContentListerSynced, ctrl.groupSnapshotClassListerSynced}...)
 	}
@@ -313,7 +313,7 @@ func (ctrl *csiSnapshotSideCarController) isDriverMatch(object interface{}) bool
 			return false
 		}
 		snapshotClassName := content.Spec.VolumeSnapshotClassName
-		if snapshotClassName != nil {
+		if snapshotClassName != nil && ctrl.classLister != nil {
 			if snapshotClass, err := ctrl.classLister.Get(*snapshotClassName); err == nil {
 				if snapshotClass.Driver != ctrl.driverName {
 					return false
