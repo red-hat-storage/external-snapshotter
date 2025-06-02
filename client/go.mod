@@ -1,10 +1,11 @@
-module github.com/kubernetes-csi/external-snapshotter/client/v8
+module github.com/red-hat-storage/external-snapshotter/client/v8
 
 go 1.22.0
 
 toolchain go1.22.3
 
 require (
+	github.com/kubernetes-csi/external-snapshotter/client/v8 v8.2.0
 	k8s.io/api v0.30.0
 	k8s.io/apimachinery v0.30.0
 	k8s.io/client-go v0.30.0
