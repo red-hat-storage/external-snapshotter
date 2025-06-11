@@ -42,7 +42,7 @@ spec:
     type: AllNamespaces
   keywords:
   - csi
-  - odf-snapshot-controller
+  - odf-external-snapshotter-operator
   links:
   - name: Snapshot Controller
     url: https://github.com/red-hat-storage/external-snapshotter
