@@ -302,7 +302,7 @@ func main() {
 	if !*leaderElection {
 		run(context.TODO())
 	} else {
-		lockName := "odf-snapshot-controller-leader"
+		lockName := "odf-external-snapshotter-operator-leader"
 		// Create a new clientset for leader election to prevent throttling
 		// due to snapshot controller
 		leClientset, err := kubernetes.NewForConfig(config)
