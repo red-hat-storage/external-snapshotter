@@ -10,7 +10,7 @@ BUNDLE_IMG ?= $(REGISTRY_NAME)/$(BUNDLE_IMAGE_NAME):$(IMAGE_TAG)
 # the PACKAGE_NAME is included in the bundle/CSV and is used in catalogsources
 # for operators (like OperatorHub.io). Products that include the ceph-csi-operator
 # bundle should use a different PACKAGE_NAME to prevent conflicts.
-PACKAGE_NAME ?= odf-snapshot-controller
+PACKAGE_NAME ?= odf-external-snapshotter-operator
 
 # Creating the New CatalogSource requires publishing CSVs that replace one operator,
 # but can skip several. This can be accomplished using the skipRange annotation:

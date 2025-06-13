@@ -2,14 +2,14 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: odf-snapshot-controller
+  name: odf-external-snapshotter-operator
   namespace: kube-system
 
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: odf-snapshot-controller-runner
+  name: odf-external-snapshotter-operator-runner
 rules:
   - apiGroups: [""]
     resources: ["persistentvolumes"]
@@ -53,21 +53,21 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: odf-snapshot-controller-role
+  name: odf-external-snapshotter-operator-role
 subjects:
   - kind: ServiceAccount
-    name: odf-snapshot-controller
+    name: odf-external-snapshotter-operator
     namespace: kube-system
 roleRef:
   kind: ClusterRole
-  name: odf-snapshot-controller-runner
+  name: odf-external-snapshotter-operator-runner
   apiGroup: rbac.authorization.k8s.io
 
 ---
 kind: Role
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: odf-snapshot-controller-leaderelection
+  name: odf-external-snapshotter-operator-leaderelection
   namespace: kube-system
 rules:
   - apiGroups: ["coordination.k8s.io"]
@@ -78,13 +78,13 @@ rules:
 kind: RoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: odf-snapshot-controller-leaderelection
+  name: odf-external-snapshotter-operator-leaderelection
   namespace: kube-system
 subjects:
   - kind: ServiceAccount
-    name: odf-snapshot-controller
+    name: odf-external-snapshotter-operator
     namespace: kube-system
 roleRef:
   kind: Role
-  name: odf-snapshot-controller-leaderelection
+  name: odf-external-snapshotter-operator-leaderelection
   apiGroup: rbac.authorization.k8s.io

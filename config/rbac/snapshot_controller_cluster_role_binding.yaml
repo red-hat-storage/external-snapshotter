@@ -1,12 +1,12 @@
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: odf-snapshot-controller-role
+  name: odf-external-snapshotter-operator-role
 subjects:
   - kind: ServiceAccount
-    name: odf-snapshot-controller
+    name: odf-external-snapshotter-operator
     namespace: openshift-storage
 roleRef:
   kind: ClusterRole
-  name: odf-snapshot-controller-runner
+  name: odf-external-snapshotter-operator-runner
   apiGroup: rbac.authorization.k8s.io

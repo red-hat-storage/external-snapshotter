@@ -6,7 +6,7 @@ metadata:
     capabilities: Basic Install
     olm.skipRange: ""
     operators.operatorframework.io/operator-type: non-standalone
-  name: odf-snapshot-controller.v4.20.0
+  name: odf-external-snapshotter-operator.v4.20.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -42,7 +42,7 @@ spec:
     type: AllNamespaces
   keywords:
   - csi
-  - odf-snapshot-controller
+  - odf-external-snapshotter-operator
   links:
   - name: Snapshot Controller
     url: https://github.com/red-hat-storage/external-snapshotter

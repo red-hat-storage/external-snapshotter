@@ -4,12 +4,12 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2025-05-28T13:05:38Z"
+    createdAt: "2025-06-11T08:23:07Z"
     olm.skipRange: ""
     operators.operatorframework.io/builder: operator-sdk-v1.34.1
     operators.operatorframework.io/operator-type: non-standalone
     operators.operatorframework.io/project_layout: unknown
-  name: odf-snapshot-controller.v4.20.0
+  name: odf-external-snapshotter-operator.v4.20.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -141,15 +141,15 @@ spec:
           verbs:
           - update
           - patch
-        serviceAccountName: odf-snapshot-controller
+        serviceAccountName: odf-external-snapshotter-operator
       deployments:
-      - name: odf-snapshot-controller
+      - name: odf-external-snapshotter-operator
         spec:
           minReadySeconds: 35
           replicas: 2
           selector:
             matchLabels:
-              app.kubernetes.io/name: odf-snapshot-controller
+              app.kubernetes.io/name: odf-external-snapshotter-operator
           strategy:
             rollingUpdate:
               maxSurge: 0
@@ -158,7 +158,7 @@ spec:
           template:
             metadata:
               labels:
-                app.kubernetes.io/name: odf-snapshot-controller
+                app.kubernetes.io/name: odf-external-snapshotter-operator
             spec:
               containers:
               - args:
@@ -167,9 +167,9 @@ spec:
                 - --feature-gates=CSIVolumeGroupSnapshot=true
                 image: quay.io/ocs-dev/snapshot-controller:latest
                 imagePullPolicy: IfNotPresent
-                name: odf-snapshot-controller
+                name: odf-external-snapshotter-operator
                 resources: {}
-              serviceAccountName: odf-snapshot-controller
+              serviceAccountName: odf-external-snapshotter-operator
       permissions:
       - rules:
         - apiGroups:
@@ -183,7 +183,7 @@ spec:
           - delete
           - update
           - create
-        serviceAccountName: odf-snapshot-controller
+        serviceAccountName: odf-external-snapshotter-operator
     strategy: deployment
   installModes:
   - supported: true
@@ -196,7 +196,7 @@ spec:
     type: AllNamespaces
   keywords:
   - csi
-  - odf-snapshot-controller
+  - odf-external-snapshotter-operator
   links:
   - name: Snapshot Controller
     url: https://github.com/red-hat-storage/external-snapshotter

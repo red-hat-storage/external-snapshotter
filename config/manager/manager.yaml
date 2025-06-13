@@ -1,13 +1,13 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: odf-snapshot-controller
+  name: odf-external-snapshotter-operator
   namespace: openshift-storage
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app.kubernetes.io/name: odf-snapshot-controller
+      app.kubernetes.io/name: odf-external-snapshotter-operator
   # The snapshot controller won't be marked as ready if the v1 CRDs are unavailable.
   # The flag --retry-crd-interval-max is used to determine how long the controller
   # will wait for the CRDs to become available before exiting. The default is 30 seconds
@@ -21,11 +21,11 @@ spec:
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: odf-snapshot-controller
+        app.kubernetes.io/name: odf-external-snapshotter-operator
     spec:
-      serviceAccountName: odf-snapshot-controller
+      serviceAccountName: odf-external-snapshotter-operator
       containers:
-        - name: odf-snapshot-controller
+        - name: odf-external-snapshotter-operator
           image: quay.io/ocs-dev/snapshot-controller:latest
           args:
             - "--v=5"
