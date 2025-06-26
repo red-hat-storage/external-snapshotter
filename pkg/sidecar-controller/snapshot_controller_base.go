@@ -207,9 +207,13 @@ func (ctrl *csiSnapshotSideCarController) enqueueContentWork(obj interface{}) {
 			klog.Errorf("failed to get key from object: %v, %v", err, content)
 			return
 		}
-		klog.V(5).Infof("enqueued %q for sync", objName)
+		if utils.IsODFManagedResource(content) {
+			klog.V(5).Infof("enqueued %q for sync", objName)
 
-		ctrl.contentQueue.Add(objName)
+			ctrl.contentQueue.Add(objName)
+		} else {
+			klog.V(5).Infof("%s is not a volumesnapshotcontent managed by ODF, doing nothing for it.", objName)
+		}
 	}
 }
 
@@ -259,11 +263,6 @@ func (ctrl *csiSnapshotSideCarController) syncContentByKey(key string) (requeue 
 	// The content still exists in informer cache, the event must have
 	// been add/update/sync
 	if err == nil {
-		if _, e := content.GetAnnotations()[utils.AnnODFManagedSnapResource]; !e {
-			klog.Infof("%s is not a volumesnapshotcontent managed by ODF, doing nothing for it.", content.GetName())
-
-			return false, nil
-		}
 		if ctrl.isDriverMatch(content) {
 			// Store the new content version in the cache and do not process it if this is
 			// an old version.
