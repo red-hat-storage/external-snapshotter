@@ -719,3 +719,10 @@ func ShouldEnqueueContentChange(old *crdv1.VolumeSnapshotContent, new *crdv1.Vol
 	}
 	return true
 }
+
+// IsODFManagedResource checks if the resource is managed and should be handled by ODF
+func IsODFManagedResource(obj metav1.Object) bool {
+	_, ok := obj.GetAnnotations()[AnnODFManagedSnapResource]
+
+	return ok
+}
