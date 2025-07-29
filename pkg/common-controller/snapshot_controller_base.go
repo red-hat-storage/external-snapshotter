@@ -321,8 +321,12 @@ func (ctrl *csiSnapshotCommonController) enqueueContentWork(obj interface{}) {
 			klog.Errorf("failed to get key from object: %v, %v", err, content)
 			return
 		}
-		klog.V(5).Infof("enqueued %q for sync", objName)
-		ctrl.contentQueue.Add(objName)
+		if utils.IsODFManagedResource(content) {
+			klog.V(5).Infof("enqueued %q for sync", objName)
+			ctrl.contentQueue.Add(objName)
+		} else {
+			klog.V(5).Infof("%s is not a volumesnapshotcontent managed by ODF, doing nothing for it.", objName)
+		}
 	}
 }
 
