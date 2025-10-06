@@ -112,3 +112,14 @@ func BuildVolumeGroupSnapshotOwnerReference(parentGroup *crdv1beta1.VolumeGroupS
 		UID:  parentGroup.UID,
 	}
 }
+
+// BuildUSVolumeGroupSnapshotOwnerReference creates a OwnerReference record declaring an
+// object as a child of passed VolumeGroupSnapshot
+func BuildUSVolumeGroupSnapshotOwnerReference(parentGroup *crdv1beta1.VolumeGroupSnapshot) metav1.OwnerReference {
+	return metav1.OwnerReference{
+		APIVersion: "groupsnapshot.storage.k8s.io/v1beta1",
+		Kind:       "VolumeGroupSnapshot",
+		Name:       parentGroup.Name,
+		UID:        "dummy-" + parentGroup.UID,
+	}
+}
