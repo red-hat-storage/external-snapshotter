@@ -606,6 +606,7 @@ func (ctrl *csiSnapshotCommonController) createSnapshotsForGroupSnapshotContent(
 				Namespace: volumeSnapshotNamespace,
 				OwnerReferences: []metav1.OwnerReference{
 					utils.BuildVolumeGroupSnapshotOwnerReference(groupSnapshot),
+					utils.BuildUSVolumeGroupSnapshotOwnerReference(groupSnapshot),
 				},
 				Finalizers: []string{utils.VolumeSnapshotInGroupFinalizer},
 				Annotations: map[string]string{
