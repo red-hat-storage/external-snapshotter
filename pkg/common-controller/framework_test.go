@@ -1950,6 +1950,13 @@ func runSyncTests(t *testing.T, tests []controllerTest, snapshotClasses []*crdv1
 		}
 		ctrl.groupSnapshotClassLister = groupstoragelisters.NewVolumeGroupSnapshotClassLister(groupIndexer)
 
+		// Inject group snapshot contents into the controller via a custom lister
+		contentIndexer := cache.NewIndexer(cache.MetaNamespaceKeyFunc, cache.Indexers{})
+		for _, groupContent := range test.initialGroupContents {
+			contentIndexer.Add(groupContent)
+		}
+		ctrl.groupSnapshotContentLister = groupstoragelisters.NewVolumeGroupSnapshotContentLister(contentIndexer)
+
 		// Run the tested functions
 		err = test.test(ctrl, reactor, test)
 		if test.expectSuccess && err != nil {
