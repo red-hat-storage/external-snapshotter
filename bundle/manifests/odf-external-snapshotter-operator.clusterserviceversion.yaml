@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2025-06-11T08:23:07Z"
+    createdAt: "2025-09-25T14:28:43Z"
     olm.skipRange: ""
     operators.operatorframework.io/builder: operator-sdk-v1.34.1
     operators.operatorframework.io/operator-type: non-standalone
@@ -168,7 +168,13 @@ spec:
                 image: quay.io/ocs-dev/snapshot-controller:latest
                 imagePullPolicy: IfNotPresent
                 name: odf-external-snapshotter-operator
-                resources: {}
+                resources:
+                  limits:
+                    cpu: 100m
+                    memory: 512Mi
+                  requests:
+                    cpu: 10m
+                    memory: 50Mi
               serviceAccountName: odf-external-snapshotter-operator
       permissions:
       - rules:

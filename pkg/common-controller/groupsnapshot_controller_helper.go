@@ -21,6 +21,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -340,9 +341,10 @@ func (ctrl *csiSnapshotCommonController) syncReadyGroupSnapshot(groupSnapshot *c
 	if !utils.IsBoundVolumeGroupSnapshotContentNameSet(groupSnapshot) {
 		return fmt.Errorf("group snapshot %s is not bound to a group snapshot content", utils.GroupSnapshotKey(groupSnapshot))
 	}
-	groupSnapshotContent, err := ctrl.getGroupSnapshotContentFromStore(*groupSnapshot.Status.BoundVolumeGroupSnapshotContentName)
-	if err != nil {
-		return nil
+	// groupSnapshotContent, err := ctrl.getGroupSnapshotContentFromStore(*groupSnapshot.Status.BoundVolumeGroupSnapshotContentName)
+	groupSnapshotContent, err := ctrl.clientset.GroupsnapshotV1beta1().VolumeGroupSnapshotContents().Get(context.TODO(), *groupSnapshot.Status.BoundVolumeGroupSnapshotContentName, metav1.GetOptions{})
+	if err != nil && !strings.Contains(err.Error(), "cannot find content") {
+		return err
 	}
 	if groupSnapshotContent == nil {
 		// this meant there is no matching group snapshot content in cache found
@@ -448,8 +450,9 @@ func (ctrl *csiSnapshotCommonController) syncUnreadyGroupSnapshot(ctx context.Co
 
 	// groupSnapshot.Spec.Source.VolumeGroupSnapshotContentName == nil - dynamically created group snapshot
 	klog.V(5).Infof("getDynamicallyProvisionedGroupContentFromStore for snapshot %s", uniqueGroupSnapshotName)
-	contentObj, err := ctrl.getDynamicallyProvisionedGroupContentFromStore(groupSnapshot)
-	if err != nil {
+	// contentObj, err := ctrl.getDynamicallyProvisionedGroupContentFromStore(groupSnapshot)
+	contentObj, err := ctrl.clientset.GroupsnapshotV1beta1().VolumeGroupSnapshotContents().Get(context.TODO(), utils.GetDynamicSnapshotContentNameForGroupSnapshot(groupSnapshot), metav1.GetOptions{})
+	if err != nil && !strings.Contains(err.Error(), "cannot find content") {
 		klog.V(4).Infof("getDynamicallyProvisionedGroupContentFromStore[%s]: error when getting group snapshot content for group snapshot %v", uniqueGroupSnapshotName, err)
 		return err
 	}
@@ -628,9 +631,20 @@ func (ctrl *csiSnapshotCommonController) createSnapshotsForGroupSnapshotContent(
 		}
 
 		createdVolumeSnapshot, err := ctrl.clientset.SnapshotV1().VolumeSnapshots(volumeSnapshotNamespace).Create(ctx, volumeSnapshot, metav1.CreateOptions{})
-		if err != nil && !apierrs.IsAlreadyExists(err) {
+		if apierrs.IsAlreadyExists(err) {
+			createdVolumeSnapshot, err = ctrl.clientset.SnapshotV1().
+				VolumeSnapshots(volumeSnapshotNamespace).
+				Get(ctx, volumeSnapshot.Name, metav1.GetOptions{})
+		}
+		if err != nil {
 			return groupSnapshotContent, fmt.Errorf(
-				"createSnapshotsForGroupSnapshotContent: creating volumesnapshot %w", err)
+				"createSnapshotsForGroupSnapshotContent: error creating or fetching volumesnapshot %w", err)
+		}
+
+		// FIX for cases where the UID might be empty
+		if createdVolumeSnapshot.GetUID() == "" {
+			return groupSnapshotContent, fmt.Errorf(
+				"createSnapshotsForGroupSnapshotContent: created snapshot %s has an empty UID", createdVolumeSnapshot.Name)
 		}
 
 		// bind the volume snapshot content to the volume snapshot
