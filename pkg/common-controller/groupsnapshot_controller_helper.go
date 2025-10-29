@@ -21,7 +21,6 @@ import (
 	"crypto/sha256"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	v1 "k8s.io/api/core/v1"
@@ -342,8 +341,8 @@ func (ctrl *csiSnapshotCommonController) syncReadyGroupSnapshot(groupSnapshot *c
 		return fmt.Errorf("group snapshot %s is not bound to a group snapshot content", utils.GroupSnapshotKey(groupSnapshot))
 	}
 	// groupSnapshotContent, err := ctrl.getGroupSnapshotContentFromStore(*groupSnapshot.Status.BoundVolumeGroupSnapshotContentName)
-	groupSnapshotContent, err := ctrl.clientset.GroupsnapshotV1beta1().VolumeGroupSnapshotContents().Get(context.TODO(), *groupSnapshot.Status.BoundVolumeGroupSnapshotContentName, metav1.GetOptions{})
-	if err != nil && !strings.Contains(err.Error(), "cannot find content") {
+	groupSnapshotContent, err := ctrl.groupSnapshotContentLister.Get(*groupSnapshot.Status.BoundVolumeGroupSnapshotContentName)
+	if err != nil && !apierrs.IsNotFound(err) {
 		return err
 	}
 	if groupSnapshotContent == nil {
@@ -451,8 +450,8 @@ func (ctrl *csiSnapshotCommonController) syncUnreadyGroupSnapshot(ctx context.Co
 	// groupSnapshot.Spec.Source.VolumeGroupSnapshotContentName == nil - dynamically created group snapshot
 	klog.V(5).Infof("getDynamicallyProvisionedGroupContentFromStore for snapshot %s", uniqueGroupSnapshotName)
 	// contentObj, err := ctrl.getDynamicallyProvisionedGroupContentFromStore(groupSnapshot)
-	contentObj, err := ctrl.clientset.GroupsnapshotV1beta1().VolumeGroupSnapshotContents().Get(context.TODO(), utils.GetDynamicSnapshotContentNameForGroupSnapshot(groupSnapshot), metav1.GetOptions{})
-	if err != nil && !strings.Contains(err.Error(), "cannot find content") {
+	contentObj, err := ctrl.groupSnapshotContentLister.Get(utils.GetDynamicSnapshotContentNameForGroupSnapshot(groupSnapshot))
+	if err != nil && !apierrs.IsNotFound(err) {
 		klog.V(4).Infof("getDynamicallyProvisionedGroupContentFromStore[%s]: error when getting group snapshot content for group snapshot %v", uniqueGroupSnapshotName, err)
 		return err
 	}
