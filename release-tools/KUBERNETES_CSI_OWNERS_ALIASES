@@ -32,6 +32,13 @@ aliases:
   - sunnylovestiramisu
   - xing-yang
 
+  external-snapshotter-team:
+  - Madhu-1
+  - nikhil-ladha
+  - black-dragon74
+  - agarwal-mudit
+  - ShyamsundarR
+
 # This documents who previously contributed to Kubernetes-CSI
 # as approver.
 emeritus_approvers:

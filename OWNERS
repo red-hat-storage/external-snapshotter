@@ -4,11 +4,13 @@ approvers:
 - kubernetes-csi-approvers
 - jingxu97
 - yuxiangqian
+- external-snapshotter-team
 
 reviewers:
 - kubernetes-csi-reviewers
 - jingxu97
 - yuxiangqian
+- external-snapshotter-team
 
 emeritus_approvers:
 - wackxu
