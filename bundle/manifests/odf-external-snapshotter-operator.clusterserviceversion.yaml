@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2025-09-25T14:28:43Z"
+    createdAt: "2026-01-27T14:03:20Z"
     olm.skipRange: ""
     operators.operatorframework.io/builder: operator-sdk-v1.34.1
     operators.operatorframework.io/operator-type: non-standalone
@@ -176,6 +176,11 @@ spec:
                     cpu: 10m
                     memory: 50Mi
               serviceAccountName: odf-external-snapshotter-operator
+              tolerations:
+              - effect: NoSchedule
+                key: node.ocs.openshift.io/storage
+                operator: Equal
+                value: "true"
       permissions:
       - rules:
         - apiGroups:

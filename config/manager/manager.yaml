@@ -42,3 +42,8 @@ spec:
             requests:
               cpu: 10m
               memory: 50Mi
+      tolerations:
+      - effect: NoSchedule
+        key: node.ocs.openshift.io/storage
+        operator: Equal
+        value: "true"
