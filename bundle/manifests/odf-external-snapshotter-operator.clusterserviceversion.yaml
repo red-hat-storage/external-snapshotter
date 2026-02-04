@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2026-01-27T14:03:20Z"
+    createdAt: "2026-01-30T10:12:41Z"
     olm.skipRange: ""
     operators.operatorframework.io/builder: operator-sdk-v1.34.1
     operators.operatorframework.io/operator-type: non-standalone
@@ -175,6 +175,7 @@ spec:
                   requests:
                     cpu: 10m
                     memory: 50Mi
+              priorityClassName: system-cluster-critical
               serviceAccountName: odf-external-snapshotter-operator
               tolerations:
               - effect: NoSchedule

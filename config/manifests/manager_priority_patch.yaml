@@ -1,0 +1,9 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: odf-external-snapshotter-operator
+  namespace: openshift-storage
+spec:
+  template:
+    spec:
+      priorityClassName: system-cluster-critical
