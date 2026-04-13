@@ -4,12 +4,12 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2026-01-30T10:12:41Z"
+    createdAt: "2026-04-08T06:41:19Z"
     olm.skipRange: ""
     operators.operatorframework.io/builder: operator-sdk-v1.34.1
     operators.operatorframework.io/operator-type: non-standalone
     operators.operatorframework.io/project_layout: unknown
-  name: odf-external-snapshotter-operator.v4.20.0
+  name: odf-external-snapshotter-operator.v4.22.0
   namespace: placeholder
 spec:
   apiservicedefinitions: {}
@@ -216,4 +216,4 @@ spec:
   provider:
     name: Red Hat Storage
     url: https://github.com/red-hat-storage
-  version: 4.20.0
+  version: 4.22.0
