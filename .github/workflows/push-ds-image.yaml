@@ -9,6 +9,9 @@ on:
       IMAGE_TAG:
         required: true
         default: "latest"
+      BUNDLE_VERSION:
+        required: false
+        default: ""
 
 jobs:
   docker-push:
@@ -31,9 +34,13 @@ jobs:
         REGISTRY_NAME: ${{ github.event.inputs.REGISTRY_NAME }}
         IMAGE_TAG: ${{ github.event.inputs.IMAGE_TAG }}
         IMAGE_BUILD_CMD: docker
+        BUNDLE_VER: ${{ github.event.inputs.BUNDLE_VERSION }}
       run: |
         # Set IMAGE_TAG to a calculated <branch>-<sha> if not specified
         export IMAGE_TAG=${IMAGE_TAG:-${IMAGE_TAG_SHA:0:-33}}
+
+        # Export BUNDLE_VERSION if specified else use the one in makefile
+        [ -n "$BUNDLE_VER" ] && export BUNDLE_VERSION=${BUNDLE_VER}
 
         # Build and push the csi-snapshotter image
         make container-csi-snapshotter
