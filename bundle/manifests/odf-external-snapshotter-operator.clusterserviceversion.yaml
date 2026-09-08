@@ -4,7 +4,7 @@ metadata:
   annotations:
     alm-examples: '[]'
     capabilities: Basic Install
-    createdAt: "2026-08-21T06:20:52Z"
+    createdAt: "2026-09-08T08:03:47Z"
     olm.skipRange: ""
     operators.operatorframework.io/builder: operator-sdk-v1.34.1
     operators.operatorframework.io/operator-type: non-standalone
@@ -157,6 +157,8 @@ spec:
             type: RollingUpdate
           template:
             metadata:
+              annotations:
+                openshift.io/required-scc: restricted-v2
               labels:
                 app.kubernetes.io/name: odf-external-snapshotter-operator
             spec:

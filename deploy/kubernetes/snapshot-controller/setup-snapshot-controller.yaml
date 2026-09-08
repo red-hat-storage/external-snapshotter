@@ -28,6 +28,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        openshift.io/required-scc: restricted-v2
       labels:
         app.kubernetes.io/name: odf-external-snapshotter-operator
     spec:
